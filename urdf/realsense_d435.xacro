@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="realsense_d435" params="prefix:='' parent:='link_eef' origin_xyz:='0 0 0' origin_rpy:='0 0 0' use_gazebo_plugin:=false">
+
+    <!-- define property -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <!-- Camera mount and body -->
+    <joint name="${prefix}camera_mount_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="${prefix}camera_link_mount" />
+      <origin xyz="${origin_xyz}" rpy="${origin_rpy}" />
+    </joint>
+    
+    <link name="${prefix}camera_link_mount">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://realsense_assets/meshes/visual/d435_with_cam_stand.stl" />
+        </geometry>
+        <material name="${prefix}Silver">
+          <color rgba="0.7 0.7 0.7 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://realsense_assets/meshes/collision/d435_with_cam_stand.stl" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Camera frames (standard RealSense layout) -->
+    <link name="${prefix}camera_link"></link>
+    <link name="${prefix}camera_depth_frame"></link>
+    <link name="${prefix}camera_depth_optical_frame"></link>
+    <link name="${prefix}camera_color_frame"></link>
+    <link name="${prefix}camera_color_optical_frame"></link>
+
+    <joint name="${prefix}camera_link_joint" type="fixed">
+      <parent link="${prefix}camera_link_mount" />
+      <child link="${prefix}camera_link" />
+      <!-- Adjustment for the mount geometry -->
+      <origin xyz="0.06746 -0.0175 0.0237" rpy="${M_PI} ${-M_PI/2} 0" />
+    </joint>
+
+    <joint name="${prefix}camera_depth_joint" type="fixed">
+      <parent link="${prefix}camera_link" />
+      <child link="${prefix}camera_depth_frame" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="${prefix}camera_depth_optical_joint" type="fixed">
+      <parent link="${prefix}camera_depth_frame" />
+      <child link="${prefix}camera_depth_optical_frame" />
+      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+    </joint>
+
+    <joint name="${prefix}camera_color_joint" type="fixed">
+      <parent link="${prefix}camera_link" />
+      <child link="${prefix}camera_color_frame" />
+      <origin xyz="0 0.015 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="${prefix}camera_color_optical_joint" type="fixed">
+      <parent link="${prefix}camera_color_frame" />
+      <child link="${prefix}camera_color_optical_frame" />
+      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+    </joint>
+
+    <!-- Gazebo plugin for simulation if enabled -->
+    <xacro:if value="${use_gazebo_plugin}">
+      <gazebo reference="${prefix}camera_link">
+        <sensor name="${prefix}realsense_d435" type="rgbd_camera">
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <topic>${prefix}camera</topic>
+          <gz_frame_id>${prefix}camera_color_optical_frame</gz_frame_id>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+
+  </xacro:macro>
+</robot>
