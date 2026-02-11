@@ -42,4 +42,4 @@ The macro creates the standard RealSense frames:
 - `camera_depth_optical_frame`: The frame used for depth data.
 
 ## Note on Meshes
-The mesh `d435_with_cam_stand.stl` includes both the D435 camera body and the L-shaped mounting bracket used in the Pfizer project.
+The mesh `d435_with_cam_stand.stl` includes both the D435 camera body and the L-shaped mounting bracket
